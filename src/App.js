@@ -1,6 +1,7 @@
 import React, {useRef} from 'react';
 import emailjs from '@emailjs/browser';
 import styled from 'styled-components';
+import axios from "axios";
 
 const LandingPage = () => {
     const formRef = useRef();
@@ -101,5 +102,21 @@ const Button = styled.button`
   color: #fff;
   cursor: pointer;
 `;
+
+
+function callChatGPT(prompt) {
+    const url = 'https://api.openai.com/v1/chat';
+    const data = {
+        prompt,
+        temperature: 0.5, // Adjust temperature parameter as desired
+    };
+
+    const headers = {
+        Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+    };
+
+    return axios.post(url, data, { headers });
+}
 
 export default LandingPage;
