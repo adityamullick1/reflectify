@@ -1,75 +1,122 @@
-import './App.css';
-import {useState} from "react";
+import React, {useRef} from 'react';
+import emailjs from '@emailjs/browser';
+import styled from 'styled-components';
+import axios from "axios";
 
-const fun = () => {
+const LandingPage = () => {
+    const formRef = useRef();
 
+    const sendEmail = (event) => {
+        event.preventDefault();
+
+        emailjs
+            .sendForm('adityaService', 'template_b92o3ed', formRef.current, 'kDv14N1AfXfoYqOKY')
+            .then((result) => {
+                console.log(result.text);
+                // Display success message
+            }, (error) => {
+                console.log(error.text);
+                // Display error message
+            });
+    };
+
+    return (<Wrapper>
+        <Title>Welcome to Reflectify!</Title>
+        <Message>Leave some feedback on what you want.</Message>
+        <Form ref={formRef} onSubmit={sendEmail}>
+            <Label>Name</Label>
+            <Input
+                type="text"
+                name="to_name"/>
+            <Label>Email</Label>
+            <Input
+                type="email"
+                name="from_name"/>
+            <Label>Message</Label>
+            <Textarea
+                name="message"/>
+            <Button type="submit">Send</Button>
+        </Form>
+    </Wrapper>);
+};
+
+const Wrapper = styled.div`
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+`;
+
+const Title = styled.h1`
+  font-size: 3rem;
+  color: #333;
+  margin: 0;
+  text-align: center;
+`;
+
+const Message = styled.p`
+  font-size: 1.5rem;
+  color: #666;
+  margin: 10px 0;
+  text-align: center;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  padding: 20px;
+  border-radius: 5px;
+  background-color: #eee;
+`;
+
+const Label = styled.label`
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+`;
+
+const Input = styled.input`
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+`;
+
+const Textarea = styled.textarea`
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  height: 100px;
+`;
+
+const Button = styled.button`
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 1px solid #333;
+  background-color: #333;
+  color: #fff;
+  cursor: pointer;
+`;
+
+
+function callChatGPT(prompt) {
+    const url = 'https://api.openai.com/v1/chat';
+    const data = {
+        prompt,
+        temperature: 0.5, // Adjust temperature parameter as desired
+    };
+
+    const headers = {
+        Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+    };
+
+    return axios.post(url, data, { headers });
 }
-function App() {
-    const [newItem, setNewItem] = useState("")
-    const [todo, setTodos] = useState([])
-    const [text, setText] = useState("")
-    const [val, setVal] = useState(0)
 
-
-
-
-
-    function handleClick() {
-        console.log("Clicked delete")
-        // send an RPC to a server
-        const xhr = new XMLHttpRequest()
-        xhr.addEventListener("progress", (event) => {
-            setVal(event.loaded)
-            console.log("loading")
-        })
-        xhr.open('GET', "https://run.mocky.io/v3/0c46397c-be0b-4adb-a5bd-781034fb81fc")
-        xhr.onload = function() {
-            if (xhr.status == 200) {
-                setText(xhr.responseText)
-            }
-        }
-        xhr.send()
-
-    }
-
-    function handleSubmit(e) {
-        e.preventDefault()
-        setTodos(curr => {
-            return [
-            ...curr,
-            {id: crypto.randomUUID(), title: newItem, completed: false}
-        ]})
-    }
-
-
-    console.log(todo)
-
-  return <> <form onSubmit={handleSubmit} className="new-item-form">
-      <div className="form-row">
-          <label htmlFor="item">New Item</label>
-          <input value={newItem} onChange={e=>setNewItem(e.target.value)} type="text" id="item" />
-      </div>
-  </form>
-    <h1 className="header">Todo list</h1>
-    <u1 className="list">
-        {todo.map(tod => {
-            return <li key={todo.id}>
-                <label>
-                    <input type="checkbox" checked={tod.completed} />
-                    {tod.id}
-                </label>
-                <button onClick={handleClick} className="btn btn-danger">{"delete"}</button>
-            </li>
-        })}
-        #test
-        #new commit
-    </u1>
-      <h1>{text}</h1>
-      <h1>{val}</h1>
-
-  </>
-
-}
-
-
-export default App;
+export default LandingPage;
