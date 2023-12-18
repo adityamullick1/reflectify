@@ -1,9 +1,17 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import emailjs from '@emailjs/browser';
 import styled from 'styled-components';
+import axios from "axios";
+import ErrorDialog, {Button, Form, Input, Label, Message, Textarea, Title, Wrapper} from "./components.tsx";
+
+
+const promptTitle = "Send a prompt";
+const openAiErrorString = "OpenAI being a bitch";
 
 const LandingPage = () => {
     const formRef = useRef();
+    const promptRef = useRef()
+    const [showError, setShowError] = useState(false)
 
     const sendEmail = (event) => {
         event.preventDefault();
@@ -16,6 +24,19 @@ const LandingPage = () => {
                 console.log(error.text);
                 // Display error message
             });
+    };
+
+    const sendPrompt = (event) => {
+        event.preventDefault();
+        console.log("calling gpt");
+
+        callChatGpt(promptRef.current.value).then((result) => {
+            console.log(result.value);
+        }).catch((error) => {
+            console.log("Showing error");
+            setShowError(true)
+
+        })
     };
 
     return (<Wrapper>
@@ -35,86 +56,35 @@ const LandingPage = () => {
                 name="message"/>
             <Button type="submit">Send</Button>
         </Form>
+        <Form onSubmit={sendPrompt}>
+            <Label>Talk to me!</Label>
+            <Input
+                type="text" ref={promptRef}/>
+            <Button type="submit">Send</Button>
+        </Form>
+        <ErrorDialog show={showError} onClose={() => setShowError(false)}
+                     title={promptTitle}
+                     message={openAiErrorString}/>
     </Wrapper>);
 };
 
-const Wrapper = styled.div`
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-`;
+const callChatGpt = async (message) => {
+    const url = 'http://localhost:3001/chat'; // API endpoint
+    console.log("request body" + message.toString());
+    const apiRequestBody = {
+        prompt: message
+    };
+    try {
+        const response = await axios.post(
+            url,
+            apiRequestBody
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error calling local server:', error);
+        throw error;
+    }
+}
 
-const Title = styled.h1`
-  font-size: 3rem;
-  color: #333;
-  margin: 0;
-  text-align: center;
-`;
-
-const Message = styled.p`
-  font-size: 1.5rem;
-  color: #666;
-  margin: 10px 0;
-  text-align: center;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  width: 400px;
-  padding: 20px;
-  border-radius: 5px;
-  background-color: #eee;
-`;
-
-const Label = styled.label`
-  font-size: 1.2rem;
-  margin-bottom: 5px;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  margin-bottom: 10px;
-  font-size: 1.2rem;
-`;
-
-const Textarea = styled.textarea`
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  margin-bottom: 10px;
-  font-size: 1.2rem;
-  height: 100px;
-`;
-
-const Button = styled.button`
-  padding: 10px 20px;
-  border-radius: 5px;
-  border: 1px solid #333;
-  background-color: #333;
-  color: #fff;
-  cursor: pointer;
-`;
-
-
-// function callChatGPT(prompt) {
-//     const url = 'https://api.openai.com/v1/chat';
-//     const data = {
-//         prompt,
-//         temperature: 0.5, // Adjust temperature parameter as desired
-//     };
-//
-//     const headers = {
-//         Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
-//         'Content-Type': 'application/json',
-//     };
-//
-//     return axios.post(url, data, { headers });
-// }
 
 export default LandingPage;
