@@ -17,7 +17,7 @@ app.post('/chat', async (req, res, retries= 3, delay=1000) => {
             ],
         }, {
             headers: {
-                'Authorization': `Bearer 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`, // OPENAI API KEY: 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
+                'Authorization': `Bearer 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`, // OPENAI API KEY: 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
                 'Content-Type': 'application/json'
             }
         });
