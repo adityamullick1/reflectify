@@ -5,6 +5,7 @@ import axios from "axios";
 import ErrorDialog, {Button, Form, Input, Label, Message, Textarea, Title, Wrapper} from "./components.tsx";
 
 
+
 const promptTitle = "Send a prompt";
 const openAiErrorString = "OpenAI being a bitch";
 
