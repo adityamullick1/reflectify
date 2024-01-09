@@ -1,12 +1,11 @@
 import styled from "styled-components";
 
 export const Wrapper = styled.div`
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
+  body {
+    height: 100vh; // 100% view height
+    width: 100vw; // 100% view width
+    position: absolute; // so it goes behind the current content
+  }
 `;
 
 export const Title = styled.h1`
@@ -26,7 +25,9 @@ export const Message = styled.p`
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
-  width: 400px;
+  justify-content: center;
+  align-items:center; // centers perpendicular to the flex direction
+  width: 100%; /* Full width of its parent */
   padding: 20px;
   border-radius: 5px;
   background-color: #eee;
@@ -49,6 +50,7 @@ export const Textarea = styled.textarea`
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ddd;
+  align-items:center; // centers perpendicular to the flex direction
   margin-bottom: 10px;
   font-size: 1.2rem;
   height: 100px;
@@ -63,26 +65,26 @@ export const Button = styled.button`
   cursor: pointer;
 `;
 const DialogWrapper = styled.div`
-  display: ${(props) => (props.show ? 'flex' : 'none')};
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
+  display: ${(props) => (props.show == "true" ? 'flex' : 'none')};
   justify-content: center;
   align-items: center;
+  position: fixed;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  height: 100vh; /* Full height of the viewport */
+  width: 100vw; /* Full width of the viewport */
+  margin: 0; /* Remove any default margin */
+  padding: 0; /* Remove any default padding */
 `;
 
 const DialogBox = styled.div`
+  display: flex;
+  flex-direction: column;
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  text-align: center;
   max-width: 500px;
-  width: 100%;
+  align-items:center; // centers perpendicular to the flex direction
 `;
 
 const DialogTitle = styled.h2`

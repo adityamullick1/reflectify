@@ -4,15 +4,16 @@ import Link from 'next/link';
 import axios from "axios";
 import ErrorDialog, {Button, Form, Input, Label, Message, Textarea, Title, Wrapper} from "./components.tsx";
 
-
-
-const promptTitle = "Send a prompt";
-const openAiErrorString = "OpenAI being a bitch";
+const failedGptCall = "Prompt failed to send";
+const successGptCall = "Success!";
 
 const Home = () => {
     const formRef = useRef();
     const promptRef = useRef()
-    const [showError, setShowError] = useState(false)
+    const [showError, setShowError] = useState("false")
+    const [dialogText, setDialogText] = useState("")
+    const [titleGptCall, setTitleGptCall] = useState("")
+
 
     const sendEmail = (event) => {
         event.preventDefault();
@@ -33,18 +34,19 @@ const Home = () => {
         console.log(promptRef.current.value);
 
         callChatGptServer(promptRef.current.value).then((result) => {
-            console.log(result.value);
+            console.log("SUCCESSFULLY CALLED");
+            console.log(result.choices[0].message.content);
+            setDialogText(result.choices[0].message.content);
+            setTitleGptCall(successGptCall);
         }).catch((error) => {
-            console.log("Showing error");
-            setShowError(true)
-
+            setDialogText(error.response === undefined ? error.message : error.response.data);
+            setTitleGptCall(failedGptCall);
+        }).finally(() => {
+            setShowError("true")
         })
     };
 
-    return (<Wrapper>
-        <Link href="/about">
-            Go to the about page
-        </Link>
+    return (<Wrapper className="container">
         <Title>Welcome to Reflectify!</Title>
         <Message>Leave some feedback on what you want.</Message>
         <Form ref={formRef} onSubmit={sendEmail}>
@@ -67,9 +69,12 @@ const Home = () => {
                 type="text" ref={promptRef}/>
             <Button type="submit">Send</Button>
         </Form>
-        <ErrorDialog show={showError} onClose={() => setShowError(false)}
-                     title={promptTitle}
-                     message={openAiErrorString}/>
+        <ErrorDialog show={showError} onClose={() => setShowError("false")}
+                     title={titleGptCall}
+                     message={dialogText}/>
+        <Link href="/about">
+            Go to the about page
+        </Link>
     </Wrapper>);
 };
 
